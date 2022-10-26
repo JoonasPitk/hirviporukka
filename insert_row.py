@@ -1,7 +1,8 @@
-# TEST THE CONNECTION TO POSTGRESQL SERVER ON LOCALHOST
+# TEST INSERT OPERATION
 
 # LIBRARIES AND MODULES
 import psycopg2  # For PostgreSQL
+
 
 # Properties of the connection string
 database = "metsastys"
@@ -18,15 +19,20 @@ try:
     
     # Create a cursor to execute commands and retrieve result set
     cursor = dbaseconnection.cursor()
-    cursor.execute("SELECT version();") # Executes version function on PG server and store result on cursor
-    version_number = cursor.fetchone() # Read result from cursor (1 row)
-    print("PostgreSQL:n versionumero on ", version_number) 
+    
+    # Execute a SQL command to add a new group
+    command = "INSERT INTO public.jakoryhma (seurue_id, ryhman_nimi) VALUES (1, 'Testiryhmä');"
+    cursor.execute(command)
+
+    # Commit the transaction
+    dbaseconnection.commit()
+    print("Uusi tietue lisättiin onnistuneesti")
 
 # Throw an error if connection or cursor creation fails                                     
 except(Exception, psycopg2.Error) as e:
     print("Tietokantayhteydessä tapahtui virhe", e)
 
-# If successful close the cursor and the connection   
+# If successful close the cursor and the connection
 finally:
     if (dbaseconnection):
         cursor.close()
