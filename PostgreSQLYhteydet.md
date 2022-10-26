@@ -15,7 +15,7 @@ max_connections = 100			# (change requires restart)
 ```
 
 ## pg_hba.conf-tiedosto
-Tämä tiedosto määrittelee, mistä ip-osoitteista ja mitä autentikaatiota käyttämällä saa muodostaa yhteyksiä palvelimeen:
+Tämä tiedosto määrittelee, mihin tietokantaan, millä käyttäjätunnuksella, mistä ip-osoitteista ja mitä autentikaatiota käyttämällä saa muodostaa yhteyksiä palvelimeen:
 
 ```
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -36,4 +36,4 @@ host    replication     all             ::1/128                 scram-sha-256
 ```
 
 Tiedostoon lisätään rivi, jossa on oman lähiverkon tiedot.
-Meillä VMNet 8.
+Meillä VMNet 8. Luokissa NAT-verkon osoite on määritelty keskitetysti olemaan `192.168.196.0/24`. Todellinen tietokone käyttää NAT-verkossa ip-osoitetta `192.168.196.1`. Kotona VMWare arpoo aina verkon osoitealueen. Se kannattaa tarkistaa joko oikean tietokoneen asetuksista tai käyttämällä VMWare Network Editor -työkalua. Sen avulla voi halutessaan muuttaa osoitesarjan samaksi kuin koulussa. Silloin koneiden siirto kodin ja koulun välillä ei vaadi asetusmuutoksia. Windows-koneessa oikean koneen osoitteet saa tarkistettua komennolla `ipconfig /all`. Luokkien Alma Linux -koneissa osoitteet selviävät `ifconfig`-komennolla.
