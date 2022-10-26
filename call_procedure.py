@@ -26,7 +26,7 @@ try:
 
     # Commit the transaction
     dbaseconnection.commit()
-    print("Tietue päivitettiin proseduurin avulla")
+    print("Tietue lisättiin proseduurin avulla")
 
 # Throw an error if connection or cursor creation fails                                     
 except(Exception, psycopg2.Error) as e:
