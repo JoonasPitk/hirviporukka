@@ -145,7 +145,6 @@ class MultiPageMainWindow(QMainWindow):
         sqlClauseValues = f"{shotById}, {shootingDay}, {weight}, '{shootingPlace}', {use}, '{animal}', '{gender}', '{ageGroup}', '{additionalInfo}'"
         sqlClauseEnd = ");"
         sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
-        print(sqlClause)
         databaseOperation = pgModule.DatabaseOperation()
         databaseOperation.insertRowToTable(self.connectionArguments, sqlClause)
 
