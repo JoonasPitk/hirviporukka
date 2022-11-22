@@ -16,14 +16,16 @@ testTableWidget = QTableWidget()
 
 # DATA PREPARATION FUNCTIONS
 def prepareTable(resultObject, tableWidget):
-    """Updates an existing TableWidget using an instance of DatabaseOperation
+    """Updates an existing table widget using an instance of DatabaseOperation
        class defined in the pgModule.
 
     Args:
         resultObject (DatabaseOperation): Instance of DatabaseOperation class -> errors and result set.
         tableWidget (QTableWidget): Instance of QTableWidget to be updated from the result set.
     """
-    
+    # Clear the table widget before populating it
+    tableWidget.clear()
+
     # If there is no error start processing rows and columns of the result set
     if resultObject.errorCode == 0:
         tableWidget.setRowCount(resultObject.rows)
@@ -43,7 +45,7 @@ def prepareTable(resultObject, tableWidget):
             rowIndex += 1
 
 def prepareComboBox(resultObject, comboBox, ixToShow, IxToReturn):
-    """_summary_
+    """Prepares data to be shown in a combo box.
 
     Args:
         resultObject (DatabaseOperation): Instance of DatabaseOperation class -> errors and result set.
@@ -54,11 +56,14 @@ def prepareComboBox(resultObject, comboBox, ixToShow, IxToReturn):
     Returns:
         list: Value of interest
     """
+    # Clear the combo box before populating it
+    comboBox.clear()
+
     # Result set is a list of tuples even when there is only one column in the view
     cBValuesOfInterest = [] # Empty list for values of interest
     cBItems = []  # Empty list for choices in the combo box
 
-    for result in resultObject.resultset:
+    for result in resultObject.resultSet:
         cBValueOfInterest = result[IxToReturn] # Choose column to use as value of interest
         resultAsString = str(result[ixToShow]) # Convert element to show in the tuple as a string
         cBItems.append(resultAsString) # Append it to the choices list of the combo box
