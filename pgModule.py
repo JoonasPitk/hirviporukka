@@ -159,7 +159,7 @@ class DatabaseOperation():
         except (Exception, psycopg2.Error)as error:
 
             # Set error values
-            self.errorCode = 1
+            self.errorCode = 1 # TODO: Design a set of error codes to use with this module
             self.errorMessage = "Tietokannan käsittely ei onnistunut"
             self.detailedMessage = str(error)
 
@@ -200,10 +200,6 @@ if __name__ == "__main__":
     # Create a dictionary for connection settings using defaults
     dictionary = testOperation.createConnectionArgumentDict(
         "metsastys", "sovellus", "Q2werty")
-    # FIXME: Correct this line.
-    """
-    print(dictionary)
-    """
     
     # Save those settings to a file
     testOperation.saveDatabaseSettingsToFile("settings.dat", dictionary)
