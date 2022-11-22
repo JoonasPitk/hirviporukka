@@ -147,7 +147,7 @@ class MultiPageMainWindow(QMainWindow):
         sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
         print(sqlClause)
         databaseOperation = pgModule.DatabaseOperation()
-        databaseOperation.insertRowToTable(self.connectionArguments)
+        databaseOperation.insertRowToTable(self.connectionArguments, sqlClause)
 
 # APPLICATION CREATION AND STARTUP
 # Check if app will be created and started directly from this file
