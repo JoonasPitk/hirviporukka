@@ -140,7 +140,7 @@ class MultiPageMainWindow(QMainWindow):
             jasen_id, kaatopaiva, ruhopaino, paikka_teksti,
             kasittelyid, elaimen_nimi, sukupuoli,
             ikaluokka, lisatieto) VALUES("""
-        sqlClauseValues = f"{shotById}, {shootingDay}, {weight}, {shootingPlace}, {use}, {animal}, {gender}, {ageGroup}, {additionalInfo}"
+        sqlClauseValues = f"{shotById}, {shootingDay}, {weight}, '{shootingPlace}', {use}, '{animal}', '{gender}', '{ageGroup}', '{additionalInfo}'"
         sqlClauseEnd = ");"
         sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
         print(sqlClause)
