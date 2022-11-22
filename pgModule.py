@@ -12,7 +12,7 @@ from decimal import Decimal # For handling decimal datatypes with extreme precis
 # CLASS DEFINITIONS
 class DatabaseOperation():
     """Creates a connection to postgreSQL database and
-    executes various SQL commands"""
+    executes various SQL commands."""
 
     # Constructor method: create a new object and set initial properties
     def __init__(self):
@@ -26,7 +26,7 @@ class DatabaseOperation():
 
     # Method for creating connection arguments
     def createConnectionArgumentDict(self, database, role, pwd, host="localhost", port="5432"):
-        """Creates a dictionary from connection arguments
+        """Creates a dictionary from connection arguments.
 
         Args:
             database (str): Database name
@@ -49,7 +49,7 @@ class DatabaseOperation():
 
     # Method for saving connection arguments to a settings file
     def saveDatabaseSettingsToFile(self, file, connectionArgs):
-        """Saves connection arguments to JSON based settings file
+        """Saves connection arguments to JSON based settings file.
 
         Args:
             file (str): Name of the JSON settings file
@@ -61,7 +61,7 @@ class DatabaseOperation():
 
     # Method for reading connection arguments from the settings file
     def readDatabaseSettingsFromFile(self, file):
-        """Reads connection arguments from JSON based settings file
+        """Reads connection arguments from JSON based settings file.
 
         Args:
             file (str): Name of the settings file
@@ -76,7 +76,7 @@ class DatabaseOperation():
 
     # Method to get all rows from a given table
     def getAllRowsFromTable(self, connectionArgs, table):
-        """Selects all rows from the table
+        """Selects all rows from the table.
 
         Args:
             connectionArgs (dict): Connection arguments in key-value pairs
@@ -126,7 +126,7 @@ class DatabaseOperation():
     # TODO: Finish writing methods for INSERT, UPDATE and DELETE.
     # Method to insert a row to a given table
     def insertRowToTable(self, connectionArgs, sqlClause):
-        """Inserts a row to table according to a SQL clause
+        """Inserts a row to table according to a SQL clause.
 
         Args:
             connectionArgs (dict): Connection arguments in key-value pairs
@@ -169,7 +169,7 @@ class DatabaseOperation():
 
     # Method to update a table
     def updateTable(self, connectionArgs, table, column, limit):
-        """Updates a table
+        """Updates a table.
 
         Args:
             connectionArgs (dict): Connection arguments in key-value pairs
@@ -181,7 +181,7 @@ class DatabaseOperation():
 
     # Method to delete a row from table
     def deleteFromTable(self, connectionArgs, table, limit):
-        """Delete rows from a table using limiting SQL statement
+        """Delete rows from a table using limiting SQL statement.
 
         Args:
             connectionArgs (dict): Connection arguments in key-value pairs
