@@ -77,46 +77,54 @@ class MultiPageMainWindow(QMainWindow):
 
         # Read data from view jaetut_lihat
         databaseOperation1 = pgModule.DatabaseOperation()
-        databaseOperation1.getAllRowsFromTable(self.connectionArguments, "public.jaetut_lihat")
+        databaseOperation1.getAllRowsFromTable(
+                self.connectionArguments, "public.jaetut_lihat")
         # TODO: MessageBox, if an error occurred
         prepareData.prepareTable(databaseOperation1, self.summaryMeatSharedTW)
 
         # Read data from view jakoryhma_yhteenveto, no need to read connection args again
         databaseOperation2 = pgModule.DatabaseOperation()
-        databaseOperation2.getAllRowsFromTable(self.connectionArguments, "public.jakoryhma_yhteenveto")
+        databaseOperation2.getAllRowsFromTable(
+                self.connectionArguments, "public.jakoryhma_yhteenveto")
         # TODO: MessageBox, if an error occurred
         prepareData.prepareTable(databaseOperation2, self.summaryGroupSummaryTW)
         
     def populateKillPage(self):
         # Read data from view kaatoluettelo
         databaseOperation1 = pgModule.DatabaseOperation()
-        databaseOperation1.getAllRowsFromTable(self.connectionArguments, "public.kaatoluettelo")
+        databaseOperation1.getAllRowsFromTable(
+                self.connectionArguments, "public.kaatoluettelo")
         # TODO: MessageBox, if an error occurred
         prepareData.prepareTable(databaseOperation1, self.shotKillsTW)
         
         # Read data from view nimivalinta
         databaseOperation2 = pgModule.DatabaseOperation()
-        databaseOperation2.getAllRowsFromTable(self.connectionArguments, "public.nimivalinta")
+        databaseOperation2.getAllRowsFromTable(
+                self.connectionArguments, "public.nimivalinta")
         self.shotByIdList = prepareData.prepareComboBox(databaseOperation2, self.shotByCB, 1, 0)
         
         # Read data from table elain, and populate the combo box
         databaseOperation3 = pgModule.DatabaseOperation()
-        databaseOperation3.getAllRowsFromTable(self.connectionArguments, "public.elain")
+        databaseOperation3.getAllRowsFromTable(
+                self.connectionArguments, "public.elain")
         self.shotAnimalText = prepareData.prepareComboBox(databaseOperation3, self.shotAnimalCB, 0, 0)
 
         # Read data from table aikuinenvasa, and populate the combo box
         databaseOperation4 = pgModule.DatabaseOperation()
-        databaseOperation4.getAllRowsFromTable(self.connectionArguments, "public.aikuinenvasa")
+        databaseOperation4.getAllRowsFromTable(
+                self.connectionArguments, "public.aikuinenvasa")
         self.shotAgeGroupText = prepareData.prepareComboBox(databaseOperation4, self.shotAgeGroupCB, 0, 0)
 
         # Read data from table sukupuoli, and populate the combo box
         databaseOperation5 = pgModule.DatabaseOperation()
-        databaseOperation5.getAllRowsFromTable(self.connectionArguments, "public.sukupuoli")
+        databaseOperation5.getAllRowsFromTable(
+                self.connectionArguments, "public.sukupuoli")
         self.shotGenderText = prepareData.prepareComboBox(databaseOperation5, self.shotGenderCB, 0, 0)
 
         # Read data from table kasittely
         databaseOperation6 = pgModule.DatabaseOperation()
-        databaseOperation6.getAllRowsFromTable(self.connectionArguments, "public.kasittely")
+        databaseOperation6.getAllRowsFromTable(
+                self.connectionArguments, "public.kasittely")
         self.shotUsageIdList = prepareData.prepareComboBox(databaseOperation6, self.shotUsageCB, 1, 0)
 
     def populateAllPages(self):
@@ -140,15 +148,20 @@ class MultiPageMainWindow(QMainWindow):
         # Insert data into kaato table
         # Create an SQL clause to insert element values to the database
         sqlClauseBeginning = """INSERT INTO public.kaato(
-            jasen_id, kaatopaiva, ruhopaino, paikka_teksti,
-            kasittelyid, elaimen_nimi, sukupuoli,
+            jasen_id, kaatopaiva, ruhopaino, paikka_teksti, 
+            kasittelyid, elaimen_nimi, sukupuoli, 
             ikaluokka, lisatieto) VALUES("""
         sqlClauseValues = f"{shotById}, '{shootingDay}', {weight}, '{shootingPlace}', {use}, '{animal}', '{gender}', '{ageGroup}', '{additionalInfo}'"
         sqlClauseEnd = ");"
         sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+
+        # Create a DatabaseOperation object to execute the SQL clause
         databaseOperation = pgModule.DatabaseOperation()
-        databaseOperation.insertRowToTable(self.connectionArguments, sqlClause)
-        # TODO: Add a refresh method to update the kaadot table widget
+        databaseOperation.insertRowToTable(
+                self.connectionArguments, sqlClause)
+        
+        # Update the page to show new data entries
+        self.populateKillPage()
 
 # APPLICATION CREATION AND STARTUP
 # Check if app will be created and started directly from this file
