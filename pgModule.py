@@ -17,8 +17,8 @@ class DatabaseOperation():
     # Constructor method: create a new object and set initial properties
     def __init__(self):
         self.errorCode = 0
-        self.errorMessage = "OK"
-        self.detailedMessage = "No errors"
+        self.errorMessage = "OK."
+        self.detailedMessage = "No errors."
         self.resultSet = []
         self.columnHeaders = []
         self.rows = 0
@@ -93,8 +93,8 @@ class DatabaseOperation():
             dbconnection = psycopg2.connect(
                 database=database, user=user, password=password, host=server, port=port)
             self.errorCode = 0
-            self.errorMessage = "Yhdistettiin tietokantaan"
-            self.detailedMessage = "Connected to database successfully"
+            self.errorMessage = "Yhdistettiin tietokantaan."
+            self.detailedMessage = "Connected to database successfully."
 
             # Create a cursor to retrieve data from the table
             with dbconnection.cursor() as cursor:
@@ -109,14 +109,14 @@ class DatabaseOperation():
 
                 # Set error values
                 self.errorCode = 0
-                self.errorMessage = "Luettiin taulu onnistuneesti"
-                self.detailedMessage = "Read all data from the table"
+                self.errorMessage = "Luettiin taulu onnistuneesti."
+                self.detailedMessage = "Read all data from the table."
 
-        except (Exception, psycopg2.Error )as error:
+        except (Exception, psycopg2.Error)as error:
 
             # Set error values
             self.errorCode = 1
-            self.errorMessage = "Tietokannan käsittely ei onnistunut"
+            self.errorMessage = "Tietokannan käsittely ei onnistunut."
             self.detailedMessage = str(error)
 
         finally:
@@ -143,8 +143,8 @@ class DatabaseOperation():
             dbconnection = psycopg2.connect(
                 database=database, user=user, password=password, host=server, port=port)
             self.errorCode = 0
-            self.errorMessage = "Yhdistettiin tietokantaan"
-            self.detailedMessage = "Connected to database successfully"
+            self.errorMessage = "Yhdistettiin tietokantaan."
+            self.detailedMessage = "Connected to database successfully."
 
             # Create a cursor to retrieve data from the table
             with dbconnection.cursor() as cursor:
@@ -152,15 +152,15 @@ class DatabaseOperation():
 
                 # Set error values
                 self.errorCode = 0
-                self.errorMessage = "Lisättiin tietue onnistuneesti"
-                self.detailedMessage = "Inserting into table was successful"
+                self.errorMessage = "Lisättiin tietue onnistuneesti."
+                self.detailedMessage = "Inserting into table was successful."
                 dbconnection.commit()
 
         except (Exception, psycopg2.Error)as error:
 
             # Set error values
             self.errorCode = 1 # TODO: Design a set of error codes to use with this module
-            self.errorMessage = "Tietokannan käsittely ei onnistunut"
+            self.errorMessage = "Tietokannan käsittely ei onnistunut."
             self.detailedMessage = str(error)
 
         finally:
