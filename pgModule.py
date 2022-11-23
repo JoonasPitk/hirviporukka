@@ -164,6 +164,7 @@ class DatabaseOperation():
             if self.errorCode == 0:
                 dbconnection.close()
 
+    # FIXME: Make updateTable properly with limiting
     # Method to update a table
     def updateTable(self, connectionArgs, table, column, limit):
         """Updates a table.
