@@ -55,8 +55,8 @@ class DatabaseOperation():
             file (str): Name of the JSON settings file
             connectionArgs (dict): Connection arguments in key-value pairs
         """
-        settingsFile = open(file, "w",)
-        json.dump(connectionArgs, settingsFile,)
+        settingsFile = open(file, "w")
+        json.dump(connectionArgs, settingsFile)
         settingsFile.close()
 
     # Method for reading connection arguments from the settings file
@@ -69,7 +69,7 @@ class DatabaseOperation():
         Returns:
             dict: Connection arguments in key-value pairs
         """
-        settingsFile = open(file, 'r',)
+        settingsFile = open(file, "r")
         connectionArgumentDict = json.load(settingsFile)
         settingsFile.close()
         return connectionArgumentDict
@@ -98,7 +98,7 @@ class DatabaseOperation():
 
             # Create a cursor to retrieve data from the table
             with dbconnection.cursor() as cursor:
-                sqlClause = "SELECT * FROM " + table + ";"
+                sqlClause = f"SELECT * FROM {table}';'"
                 cursor.execute(sqlClause)
 
                 # Set object properties
@@ -122,7 +122,6 @@ class DatabaseOperation():
             if self.errorCode == 0:
                 dbconnection.close()
     
-    # TODO: Finish writing methods for INSERT, UPDATE and DELETE.
     # Method to insert a row to a given table
     def insertRowToTable(self, connectionArgs, sqlClause):
         """Inserts a row to table according to a SQL clause.
@@ -175,9 +174,43 @@ class DatabaseOperation():
             column (str): Column to be updated
             limit (str): WHERE SQL statement
         """
-        pass
+        server = connectionArgs["server"]
+        port = connectionArgs["port"]
+        database = connectionArgs["database"]
+        user = connectionArgs["user"]
+        password = connectionArgs["password"]
 
-    # Method to delete a row from table
+        try:
+            # Connect to the database and set error parameters
+            dbconnection = psycopg2.connect(
+                database=database, user=user, password=password, host=server, port=port)
+            self.errorCode = 0
+            self.errorMessage = "Yhdistettiin tietokantaan."
+            self.detailedMessage = "Connected to database successfully."
+
+            # Create a cursor to retrieve data from the table
+            with dbconnection.cursor() as cursor:
+                procedureCall = f"UPDATE {table} SET {column} WHERE {limit}" 
+                cursor.execute(procedureCall)
+
+                # Set error values
+                self.errorCode = 0
+                self.errorMessage = "Päivitys suoritettiin onnistuneesti."
+                self.detailedMessage = "Update was successful."
+                dbconnection.commit()
+
+        except (Exception, psycopg2.Error)as error:
+            # Set error values
+            self.errorCode = 1 # TODO: Design a set of error codes to use with this module
+            self.errorMessage = "Tietokannan käsittely ei onnistunut."
+            self.detailedMessage = str(error)
+
+        finally:
+            if self.errorCode == 0:
+                dbconnection.close()
+
+
+    # Method to delete a row from a table
     def deleteFromTable(self, connectionArgs, table, limit):
         """Delete rows from a table using limiting SQL statement.
 
@@ -186,7 +219,40 @@ class DatabaseOperation():
             table (str): Table name
             limit (str): WHERE SQL statement
         """
-        pass
+        server = connectionArgs["server"]
+        port = connectionArgs["port"]
+        database = connectionArgs["database"]
+        user = connectionArgs["user"]
+        password = connectionArgs["password"]
+
+        try:
+            # Connect to the database and set error parameters
+            dbconnection = psycopg2.connect(
+                database=database, user=user, password=password, host=server, port=port)
+            self.errorCode = 0
+            self.errorMessage = "Yhdistettiin tietokantaan."
+            self.detailedMessage = "Connected to database successfully."
+
+            # Create a cursor to retrieve data from the table
+            with dbconnection.cursor() as cursor:
+                procedureCall = f"DELETE FROM {table} WHERE {limit}" 
+                cursor.execute(procedureCall)
+
+                # Set error values
+                self.errorCode = 0
+                self.errorMessage = "Poisto suoritettiin onnistuneesti."
+                self.detailedMessage = "Delete operation was successful."
+                dbconnection.commit()
+
+        except (Exception, psycopg2.Error)as error:
+            # Set error values
+            self.errorCode = 1 # TODO: Design a set of error codes to use with this module
+            self.errorMessage = "Tietokannan käsittely ei onnistunut."
+            self.detailedMessage = str(error)
+
+        finally:
+            if self.errorCode == 0:
+                dbconnection.close()
 
     # Method to call a stored procedure and pass parameters
     def callProcedure(self, connectionArgs, procedure, params):
@@ -218,7 +284,7 @@ class DatabaseOperation():
 
                 # Set error values
                 self.errorCode = 0
-                self.errorMessage = "Suoritettiin proseduuri onnistuneesti."
+                self.errorMessage = "Proseduuri suoritettiin onnistuneesti."
                 self.detailedMessage = "Procedure call was successful."
                 dbconnection.commit()
 
@@ -246,9 +312,9 @@ if __name__ == "__main__":
     testOperation.saveDatabaseSettingsToFile("settings.dat", dictionary)
 
     # Read settings back from the file
-    readedSettings = testOperation.readDatabaseSettingsFromFile("settings.dat")
+    settingsRead = testOperation.readDatabaseSettingsFromFile("settings.dat")
 
-    # print(readedSettings)
-    testOperation.getAllRowsFromTable(readedSettings, "public.jasen")
+    # print(settingsRead)
+    testOperation.getAllRowsFromTable(settingsRead, "public.jasen")
 
     print(testOperation.resultSet)
