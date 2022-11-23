@@ -7,6 +7,7 @@ import sys # Needed for starting the application
 from PyQt5.QtWidgets import * # All widgets
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import * # FIXME: Everything for now, change to individual components
+from datetime import date
 import pgModule, prepareData
 
 
@@ -33,7 +34,9 @@ class MultiPageMainWindow(QMainWindow):
         self.setStatusBar(self.statusBar)
         self.statusBar.show() # Make it visible
 
-        # TODO: Set current date to all date widgets
+        # Set current date when the application launches
+        self.currentDate = date.today()
+
         # Summary page (Yhteenveto)
         self.summaryRefreshBtn = self.summaryRefreshPushButton
         self.summaryRefreshBtn.clicked.connect(self.populateSummaryPage)
@@ -99,9 +102,7 @@ class MultiPageMainWindow(QMainWindow):
         alertDialog.setStandardButtons(QMessageBox.Ok) # Only OK is needed to close the dialog
         alertDialog.exec_() # Open the message box
 
-    # A method to populate summaryPage's table
     def populateSummaryPage(self):
-
         # Read data from view jaetut_lihat
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
@@ -113,7 +114,8 @@ class MultiPageMainWindow(QMainWindow):
                     "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
                     databaseOperation1.errorMessage,
                     databaseOperation1.detailedMessage)
-        prepareData.prepareTable(databaseOperation1, self.summaryMeatSharedTW)
+        else:
+            prepareData.prepareTable(databaseOperation1, self.summaryMeatSharedTW)
 
         # Read data from view jakoryhma_yhteenveto
         databaseOperation2 = pgModule.DatabaseOperation()
@@ -126,9 +128,13 @@ class MultiPageMainWindow(QMainWindow):
                     "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
                     databaseOperation2.errorMessage,
                     databaseOperation2.detailedMessage)
-        prepareData.prepareTable(databaseOperation2, self.summaryGroupSummaryTW)
+        else:
+            prepareData.prepareTable(databaseOperation2, self.summaryGroupSummaryTW)
         
     def populateKillPage(self):
+        # Set default date to current date
+        self.shotDateDE.setDate(self.currentDate)
+        
         # Read data from view kaatoluettelo
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
@@ -223,33 +229,37 @@ class MultiPageMainWindow(QMainWindow):
         self.populateKillPage()
 
     def saveShot(self):
-        # TODO: Add error handling and message box when an error occurs.
-        shotByChosenItemIx = self.shotByCB.currentIndex() # Row index of the selected row
-        shotById = self.shotByIdList[shotByChosenItemIx] # ID value of the selected row
-        shootingDay = self.shotDateDE.date().toPyDate() # Python data is in ISO format
-        shootingPlace = self.shotLocationLE.text() # Text value of line edit
-        animal = self.shotAnimalCB.currentText() # Selected value of the combo box
-        ageGroup = self.shotAgeGroupCB.currentText() # Selected value of the combo box
-        gender = self.shotGenderCB.currentText() # Selected value of the combo box
-        weight = float(self.shotWeightLE.text()) # Convert line edit value into float (real in the DB)
-        useIx = self.shotUsageCB.currentIndex() # Row index of the selected row
-        use = self.shotUsageIdList[useIx] # ID value of the selected row
-        additionalInfo = self.shotAddInfoTE.toPlainText() # Convert multiline text edit into plain text
+        try:
+            shotByChosenItemIx = self.shotByCB.currentIndex() # Row index of the selected row
+            shotById = self.shotByIdList[shotByChosenItemIx] # ID value of the selected row
+            shootingDay = self.shotDateDE.date().toPyDate() # Python data is in ISO format
+            shootingPlace = self.shotLocationLE.text() # Text value of line edit
+            animal = self.shotAnimalCB.currentText() # Selected value of the combo box
+            ageGroup = self.shotAgeGroupCB.currentText() # Selected value of the combo box
+            gender = self.shotGenderCB.currentText() # Selected value of the combo box
+            weight = float(self.shotWeightLE.text()) # Convert line edit value into float (real in the DB)
+            useIx = self.shotUsageCB.currentIndex() # Row index of the selected row
+            use = self.shotUsageIdList[useIx] # ID value of the selected row
+            additionalInfo = self.shotAddInfoTE.toPlainText() # Convert multiline text edit into plain text
 
-        # Insert data into kaato table
-        # Create an SQL clause to insert element values to the database
-        sqlClauseBeginning = """INSERT INTO public.kaato(
-            jasen_id, kaatopaiva, ruhopaino, paikka_teksti,
-            kasittelyid, elaimen_nimi, sukupuoli,
-            ikaluokka, lisatieto) VALUES("""
-        sqlClauseValues = f"{shotById}, '{shootingDay}', {weight}, '{shootingPlace}', {use}, '{animal}', '{gender}', '{ageGroup}', '{additionalInfo}'"
-        sqlClauseEnd = ");"
-        sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+            # Insert data into kaato table
+            # Create an SQL clause to insert element values to the database
+            sqlClauseBeginning = """INSERT INTO public.kaato(
+                jasen_id, kaatopaiva, ruhopaino, paikka_teksti,
+                kasittelyid, elaimen_nimi, sukupuoli,
+                ikaluokka, lisatieto) VALUES("""
+            sqlClauseValues = f"{shotById}, '{shootingDay}', {weight}, '{shootingPlace}', {use}, '{animal}', '{gender}', '{ageGroup}', '{additionalInfo}'"
+            sqlClauseEnd = ");"
+            sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 
-        # Create a DatabaseOperation object to execute the SQL clause
-        databaseOperation = pgModule.DatabaseOperation()
-        databaseOperation.insertRowToTable(
-                self.connectionArguments, sqlClause)
+        except:
+            self.alert("Virheellinen syöte", "Tarkista antamasi tiedot.", "Testiteksti.", "Additional info")
+
+        finally:
+            # Create a databaseOperation object to execute the SQL clause
+            databaseOperation = pgModule.DatabaseOperation()
+            databaseOperation.insertRowToTable(
+                    self.connectionArguments, sqlClause)
         
         # Check if an error has occurred
         if databaseOperation.errorCode != 0:
@@ -257,8 +267,13 @@ class MultiPageMainWindow(QMainWindow):
                     "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
                     databaseOperation.errorMessage,
                     databaseOperation.detailedMessage)
-        # Update the page to show new data entries
-        self.populateKillPage()
+        else:
+            # Update the page to show new data entries
+            # and clear previous data from fields
+            self.populateKillPage()
+            self.shotLocationLE.clear()
+            self.shotWeightLE.clear()
+            self.shotAddInfoTE.clear()
 
 # APPLICATION CREATION AND STARTUP
 # Check if app will be created and started directly from this file
