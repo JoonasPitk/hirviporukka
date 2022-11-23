@@ -275,7 +275,7 @@ class Ui_MainWindow(object):
         self.animalLabel.setText(_translate("MainWindow", "Eläin"))
         self.ageGroupLabel.setText(_translate("MainWindow", "Ikäryhmä"))
         self.genderLabel.setText(_translate("MainWindow", "Sukupuoli"))
-        self.weightLabel.setText(_translate("MainWindow", "Paino"))
+        self.weightLabel.setText(_translate("MainWindow", "Paino (kg)"))
         self.usageLabel.setText(_translate("MainWindow", "Käyttö"))
         self.additionalInfoTextEdit.setToolTip(_translate("MainWindow", "Tähän vieraan kaatajan nimi tai havaintoja eläimestä"))
         self.additionalInfoLabel.setText(_translate("MainWindow", "Lisätietoja"))
