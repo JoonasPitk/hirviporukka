@@ -22,7 +22,7 @@ class MultiPageMainWindow(QMainWindow):
 
         # Read database connection arguments from the setting file
         databaseOperation = pgModule.DatabaseOperation()
-        self.connectionArguments = databaseOperation.readDatabaseSettingsFromFile("setting.dat")
+        self.connectionArguments = databaseOperation.readDatabaseSettingsFromFile("settings.dat")
 
         
         # UI ELEMENTS TO PROPERTIES
