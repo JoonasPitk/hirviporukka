@@ -22,10 +22,18 @@ class MultiPageMainWindow(QMainWindow):
 
         # Read database connection arguments from the setting file
         databaseOperation = pgModule.DatabaseOperation()
-        self.connectionArguments = databaseOperation.readDatabaseSettingsFromFile("settings.dat")
+        self.connectionArguments = databaseOperation.readDatabaseSettingsFromFile(
+                "settings.dat")
 
         
         # UI ELEMENTS TO PROPERTIES
+        # Create a status bar to show informative messages (replaces print function used in previous exercises)
+        self.statusBar = QStatusBar() # Create a status bar object
+        # Set it as the status bar for the main window
+        self.setStatusBar(self.statusBar)
+        self.statusBar.show() # Make it visible
+
+        # TODO: Set current date to all date widgets
         # Summary page (Yhteenveto)
         self.summaryRefreshBtn = self.summaryRefreshPushButton
         self.summaryRefreshBtn.clicked.connect(self.populateSummaryPage)
@@ -43,7 +51,7 @@ class MultiPageMainWindow(QMainWindow):
         self.shotUsageCB = self.usageComboBox
         self.shotAddInfoTE = self.additionalInfoTextEdit
         self.shotSavePushBtn = self.saveShotPushButton
-        self.shotSavePushBtn.clicked.connect(self.saveShot)
+        self.shotSavePushBtn.clicked.connect(self.saveShot) # Signal
         self.shotKillsTW = self.killsKillsTableWidget
 
        # Share page (Lihanjako)
@@ -72,6 +80,25 @@ class MultiPageMainWindow(QMainWindow):
 
 
     # SLOTS
+    # Create an alert dialog for critical failures, eg no database connection established
+    def alert(self, windowTitle, alertMsg, additionalMsg, details):
+        """Creates a message box for critical errors.
+
+        Args:
+            windowTitle (str): Title of the message box
+            alertMsg (str): A short description of the error in Finnish
+            additionalMsg (str): Additional info in Finnish
+            details (str): Details about the error in English
+        """
+        alertDialog = QMessageBox() # Create a message box object
+        alertDialog.setWindowTitle(windowTitle) # Add appropriate title to the message box
+        alertDialog.setIcon(QMessageBox.Critical) # Set icon to critical
+        alertDialog.setText(alertMsg) # Basic information about the error in Finnish
+        alertDialog.setInformativeText(additionalMsg) # Additional information about the error in Finnish
+        alertDialog.setDetailedText(details) # Technical details in English (from psycopg2)
+        alertDialog.setStandardButtons(QMessageBox.Ok) # Only OK is needed to close the dialog
+        alertDialog.exec_() # Open the message box
+
     # A method to populate summaryPage's table
     def populateSummaryPage(self):
 
@@ -79,14 +106,26 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
                 self.connectionArguments, "public.jaetut_lihat")
-        # TODO: MessageBox, if an error occurred
+
+        # Check if an error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation1.errorMessage,
+                    databaseOperation1.detailedMessage)
         prepareData.prepareTable(databaseOperation1, self.summaryMeatSharedTW)
 
-        # Read data from view jakoryhma_yhteenveto, no need to read connection args again
+        # Read data from view jakoryhma_yhteenveto
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(
                 self.connectionArguments, "public.jakoryhma_yhteenveto")
-        # TODO: MessageBox, if an error occurred
+        
+        # Check if an error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation2.errorMessage,
+                    databaseOperation2.detailedMessage)
         prepareData.prepareTable(databaseOperation2, self.summaryGroupSummaryTW)
         
     def populateKillPage(self):
@@ -94,38 +133,90 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
                 self.connectionArguments, "public.kaatoluettelo")
-        # TODO: MessageBox, if an error occurred
-        prepareData.prepareTable(databaseOperation1, self.shotKillsTW)
+        
+        # Check if an error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation1.errorMessage,
+                    databaseOperation1.detailedMessage)
+        else:
+            prepareData.prepareTable(databaseOperation1, self.shotKillsTW)
         
         # Read data from view nimivalinta
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(
                 self.connectionArguments, "public.nimivalinta")
-        self.shotByIdList = prepareData.prepareComboBox(databaseOperation2, self.shotByCB, 1, 0)
+        
+        # Check if an error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation2.errorMessage,
+                    databaseOperation2.detailedMessage)
+        else:
+            self.shotByIdList = prepareData.prepareComboBox(
+                databaseOperation2, self.shotByCB, 1, 0)
         
         # Read data from table elain, and populate the combo box
         databaseOperation3 = pgModule.DatabaseOperation()
         databaseOperation3.getAllRowsFromTable(
                 self.connectionArguments, "public.elain")
-        self.shotAnimalText = prepareData.prepareComboBox(databaseOperation3, self.shotAnimalCB, 0, 0)
+        
+        # Check if an error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation3.errorMessage,
+                    databaseOperation3.detailedMessage)
+        else:
+           self.shotAnimalText = prepareData.prepareComboBox(
+                databaseOperation3, self.shotAnimalCB, 0, 0)
 
         # Read data from table aikuinenvasa, and populate the combo box
         databaseOperation4 = pgModule.DatabaseOperation()
         databaseOperation4.getAllRowsFromTable(
                 self.connectionArguments, "public.aikuinenvasa")
-        self.shotAgeGroupText = prepareData.prepareComboBox(databaseOperation4, self.shotAgeGroupCB, 0, 0)
+        
+        # Check if an error has occurred
+        if databaseOperation4.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation4.errorMessage,
+                    databaseOperation4.detailedMessage)
+        else:
+            self.shotAgeGroupText = prepareData.prepareComboBox(
+                databaseOperation4, self.shotAgeGroupCB, 0, 0)
 
         # Read data from table sukupuoli, and populate the combo box
         databaseOperation5 = pgModule.DatabaseOperation()
         databaseOperation5.getAllRowsFromTable(
                 self.connectionArguments, "public.sukupuoli")
-        self.shotGenderText = prepareData.prepareComboBox(databaseOperation5, self.shotGenderCB, 0, 0)
+        
+        # Check if an error has occurred
+        if databaseOperation5.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation5.errorMessage,
+                    databaseOperation5.detailedMessage)
+        else:
+            self.shotGenderText = prepareData.prepareComboBox(
+                databaseOperation5, self.shotGenderCB, 0, 0)
 
         # Read data from table kasittely
         databaseOperation6 = pgModule.DatabaseOperation()
         databaseOperation6.getAllRowsFromTable(
                 self.connectionArguments, "public.kasittely")
-        self.shotUsageIdList = prepareData.prepareComboBox(databaseOperation6, self.shotUsageCB, 1, 0)
+        
+        # Check if an error has occurred
+        if databaseOperation6.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation6.errorMessage,
+                    databaseOperation6.detailedMessage)
+        else:
+            self.shotUsageIdList = prepareData.prepareComboBox(
+                databaseOperation6, self.shotUsageCB, 1, 0)
 
     def populateAllPages(self):
         self.populateSummaryPage()
@@ -148,8 +239,8 @@ class MultiPageMainWindow(QMainWindow):
         # Insert data into kaato table
         # Create an SQL clause to insert element values to the database
         sqlClauseBeginning = """INSERT INTO public.kaato(
-            jasen_id, kaatopaiva, ruhopaino, paikka_teksti, 
-            kasittelyid, elaimen_nimi, sukupuoli, 
+            jasen_id, kaatopaiva, ruhopaino, paikka_teksti,
+            kasittelyid, elaimen_nimi, sukupuoli,
             ikaluokka, lisatieto) VALUES("""
         sqlClauseValues = f"{shotById}, '{shootingDay}', {weight}, '{shootingPlace}', {use}, '{animal}', '{gender}', '{ageGroup}', '{additionalInfo}'"
         sqlClauseEnd = ");"
@@ -160,6 +251,12 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation.insertRowToTable(
                 self.connectionArguments, sqlClause)
         
+        # Check if an error has occurred
+        if databaseOperation.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation.errorMessage,
+                    databaseOperation.detailedMessage)
         # Update the page to show new data entries
         self.populateKillPage()
 
