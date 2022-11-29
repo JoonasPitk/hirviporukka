@@ -230,7 +230,7 @@ class MultiPageMainWindow(QMainWindow):
         self.populateKillPage()
 
     def saveShot(self):
-        errorOccured = False
+        errorOccurred = False
         try:
             shotByChosenItemIx = self.shotByCB.currentIndex() # Row index of the selected row
             shotById = self.shotByIdList[shotByChosenItemIx] # ID value of the selected row
@@ -255,30 +255,30 @@ class MultiPageMainWindow(QMainWindow):
             sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 
         except Exception as error:
-            errorOccured = True
+            errorOccurred = True
             self.alert("Virheellinen syöte", "Tarkista antamasi tiedot.",
                 "Tyyppivirhe.", str(error))
 
         finally:
-            if errorOccured == False:
+            if errorOccurred == False:
                 # Create a databaseOperation object to execute the SQL clause
                 databaseOperation = pgModule.DatabaseOperation()
                 databaseOperation.insertRowToTable(
                         self.connectionArguments, sqlClause)
         
-        # Check if an error has occurred
-        if databaseOperation.errorCode != 0:
-            self.alert(
-                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
-                    databaseOperation.errorMessage,
-                    databaseOperation.detailedMessage)
-        else:
-            # Update the page to show new data entries
-            # and clear previous data from fields
-            self.populateKillPage()
-            self.shotLocationLE.clear()
-            self.shotWeightLE.clear()
-            self.shotAddInfoTE.clear()
+                # Check if an error has occurred
+                if databaseOperation.errorCode != 0:
+                    self.alert(
+                            "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                            databaseOperation.errorMessage,
+                            databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data entries
+                    # and clear previous data from fields
+                    self.populateKillPage()
+                    self.shotLocationLE.clear()
+                    self.shotWeightLE.clear()
+                    self.shotAddInfoTE.clear()
 
 # APPLICATION CREATION AND STARTUP
 # Check if app will be created and started directly from this file

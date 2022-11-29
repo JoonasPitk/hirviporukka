@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>726</width>
+    <width>603</width>
     <height>600</height>
    </rect>
   </property>
@@ -704,7 +704,7 @@
      <attribute name="title">
       <string>Ylläpito</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="huntingClubGroupBox">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -717,7 +717,7 @@
        <string>Seura</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_2">
+     <widget class="QGroupBox" name="entourageGroupBox">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -730,11 +730,11 @@
        <string>Seurue</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_3">
+     <widget class="QGroupBox" name="shareGroupGroupBox">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>200</y>
+        <y>280</y>
         <width>271</width>
         <height>221</height>
        </rect>
@@ -743,17 +743,168 @@
        <string>Jakoryhmä</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_4">
+     <widget class="QLineEdit" name="firstNameLineEdit">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>271</width>
-        <height>181</height>
+        <y>20</y>
+        <width>113</width>
+        <height>20</height>
        </rect>
       </property>
-      <property name="title">
-       <string>Jäsen</string>
+     </widget>
+     <widget class="QLineEdit" name="lastNameLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>20</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="streetLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="postalCodeLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>100</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cityLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>100</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="firstNameLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>47</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Etunimi</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lastNameLabel">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>0</y>
+        <width>47</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Sukunimi</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="streetLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Jakeluosoite</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="postalCodeLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Postinumero</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="cityLabel">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>80</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Postitoimipaikka</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="addMemberPushButton">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>130</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Uusi</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="removeMemberComboBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>190</y>
+        <width>161</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="removeMemberLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>170</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Poistettava jäsen</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="removeMemberPushButton">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>190</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Poista</string>
       </property>
      </widget>
     </widget>
@@ -764,7 +915,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>726</width>
+     <width>603</width>
      <height>21</height>
     </rect>
    </property>

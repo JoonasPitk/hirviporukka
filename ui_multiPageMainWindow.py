@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(726, 600)
+        MainWindow.resize(603, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -212,7 +212,7 @@ class Ui_MainWindow(object):
         self.groupBox.setGeometry(QtCore.QRect(300, 10, 281, 181))
         self.groupBox.setObjectName("groupBox")
         self.groupBox_2 = QtWidgets.QGroupBox(self.maintenancePage)
-        self.groupBox_2.setGeometry(QtCore.QRect(300, 200, 281, 221))
+        self.groupBox_2.setGeometry(QtCore.QRect(300, 280, 281, 221))
         self.groupBox_2.setObjectName("groupBox_2")
         self.groupBox_3 = QtWidgets.QGroupBox(self.maintenancePage)
         self.groupBox_3.setGeometry(QtCore.QRect(10, 200, 271, 221))
