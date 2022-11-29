@@ -98,7 +98,7 @@ class DatabaseOperation():
 
             # Create a cursor to retrieve data from the table
             with dbconnection.cursor() as cursor:
-                sqlClause = f"SELECT * FROM {table}';'"
+                sqlClause = f"SELECT * FROM {table};"
                 cursor.execute(sqlClause)
 
                 # Set object properties
@@ -307,7 +307,7 @@ if __name__ == "__main__":
 
     # Create a dictionary for connection settings using defaults
     dictionary = testOperation.createConnectionArgumentDict(
-        "metsastys", "sovellus", "Q2werty")
+        "metsastys_tuotanto", "sovellus", "Q2werty")
     
     # Save those settings to a file
     testOperation.saveDatabaseSettingsToFile("settings.dat", dictionary)
