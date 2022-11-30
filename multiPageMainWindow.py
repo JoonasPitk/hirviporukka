@@ -55,15 +55,16 @@ class MultiPageMainWindow(QMainWindow):
         self.shotAddInfoTE = self.additionalInfoTextEdit
         self.shotSavePushBtn = self.saveShotPushButton
         self.shotSavePushBtn.clicked.connect(self.saveShot) # Signal
-        self.shotKillsTW = self.killsKillsTableWidget
+        self.shotKillsTW = self.killsTableWidget
 
        # Share page (Lihanjako)
         self.shareKillsTW = self.shareKillsTableWidget
-        self.shareDE = self.shareDateEdit
+        self.shareDateDE = self.shareDateEdit
         self.sharePortionCB = self.portionComboBox
         self.shareAmountLE = self.amountLineEdit
         self.shareGroupCB = self.groupComboBox
         self.shareSavePushBtn = self.shareSavePushButton
+        self.shareSavePushBtn.clicked.connect(self.saveShare) # Signal
 
         # License page (Luvat)
         self.licenseYearLE = self.licenseYearLineEdit
@@ -72,7 +73,11 @@ class MultiPageMainWindow(QMainWindow):
         self.licenseGenderCB = self.licenseGenderComboBox
         self.licenseAmountLE = self.licenseAmountLineEdit
         self.licenseSavePushBtn = self.licenseSavePushButton
+        self.licenseSavePushBtn.clicked.connect(self.saveLicense) # Signal
         self.licenseSummaryTW = self.licenseSummaryTableWidget
+
+        # Maintenance page (Ylläpito)
+        # TODO: Add UI elements for Ylläpito
 
         # Signal when a page is opened
         self.pageTab = self.tabWidget
@@ -149,7 +154,7 @@ class MultiPageMainWindow(QMainWindow):
         else:
             prepareData.prepareTable(databaseOperation1, self.shotKillsTW)
         
-        # Read data from view nimivalinta
+        # Read data from view nimivalinta, and populate the combo box
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(
                 self.connectionArguments, "public.nimivalinta")
@@ -209,7 +214,7 @@ class MultiPageMainWindow(QMainWindow):
             self.shotGenderText = prepareData.prepareComboBox(
                 databaseOperation5, self.shotGenderCB, 0, 0)
 
-        # Read data from table kasittely
+        # Read data from table kasittely, and populate the combo box
         databaseOperation6 = pgModule.DatabaseOperation()
         databaseOperation6.getAllRowsFromTable(
                 self.connectionArguments, "public.kasittely")
@@ -224,10 +229,64 @@ class MultiPageMainWindow(QMainWindow):
             self.shotUsageIdList = prepareData.prepareComboBox(
                 databaseOperation6, self.shotUsageCB, 1, 0)
 
-    # TODO: Make populateSharePage and populateLicensePage
+    # TODO: Finish populateSharePage
+    def populateSharePage(self):
+        # Set default date to current date
+        self.shareDateDE.setDate(self.currentDate)
+        
+        # Read data from view kaatoyhteenveto
+        databaseOperation1 = pgModule.DatabaseOperation()
+        databaseOperation1.getAllRowsFromTable(
+                self.connectionArguments, "public.jaettavat_lihat")
+        
+        # Check if an error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation1.errorMessage,
+                    databaseOperation1.detailedMessage)
+        else:
+            prepareData.prepareTable(databaseOperation1, self.shareKillsTW)
+        
+        # Read data from table ruhonosa, and populate the combo box
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(
+                self.connectionArguments, "public.ruhonosa")
+        
+        # Check if an error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation2.errorMessage,
+                    databaseOperation2.detailedMessage)
+        else:
+            self.sharePortionText = prepareData.prepareComboBox(
+                databaseOperation2, self.sharePortionCB, 0, 0)
+        
+        # Read data from table jakoryhma, and populate the combo box
+        databaseOperation3 = pgModule.DatabaseOperation()
+        databaseOperation3.getAllRowsFromTable(
+                self.connectionArguments, "public.jakoryhma")
+        
+        # Check if an error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation3.errorMessage,
+                    databaseOperation3.detailedMessage)
+        else:
+           self.shareGroupList = prepareData.prepareComboBox(
+                databaseOperation3, self.shareGroupCB, 2, 0)
+
+    # TODO: Finish populateLicensePage
+    def populateLicensePage(self):
+        pass
+
     def populateAllPages(self):
         self.populateSummaryPage()
         self.populateKillPage()
+        self.populateSharePage()
+        self.populateLicensePage()
 
     def saveShot(self):
         errorOccurred = False
@@ -279,6 +338,52 @@ class MultiPageMainWindow(QMainWindow):
                     self.shotLocationLE.clear()
                     self.shotWeightLE.clear()
                     self.shotAddInfoTE.clear()
+
+    # TODO: Finish saveShare.
+    def saveShare(self):
+        errorOccurred = False
+        try:
+            shareDate = self.shareDateDE.date().toPyDate() # Python data is in ISO format
+            portion = self.sharePortionCB.currentText() # Selected value of the combo box
+            weight = float(self.shareAmountLE.text()) # Convert line edit value into float (real in the DB)
+            shareByChosenItemIx = self.shareGroupCB.currentIndex() # Row index of the selected row
+            group = self.shareGroupList[shareByChosenItemIx] # ID value of the selected row
+
+            # Insert data into jakotapahtuma table
+            # Create an SQL clause to insert element values to the database
+            sqlClauseBeginning = """INSERT INTO public.jakotapahtuma(
+                paiva, maara, osnimitys, ryhma_id) VALUES("""
+            sqlClauseValues = f"'{shareDate}', {portion}, '{weight}', '{group}'"
+            sqlClauseEnd = ");"
+            sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+
+        except Exception as error:
+            errorOccurred = True
+            self.alert("Virheellinen syöte", "Tarkista antamasi tiedot.",
+                "Tyyppivirhe.", str(error))
+
+        finally:
+            if errorOccurred == False:
+                # Create a databaseOperation object to execute the SQL clause
+                databaseOperation = pgModule.DatabaseOperation()
+                databaseOperation.insertRowToTable(
+                        self.connectionArguments, sqlClause)
+        
+                # Check if an error has occurred
+                if databaseOperation.errorCode != 0:
+                    self.alert(
+                            "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                            databaseOperation.errorMessage,
+                            databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data entries
+                    # and clear previous data from fields
+                    self.populateSharePage()
+                    self.shareAmountLE.clear()
+
+    # TODO: Finish saveLicense
+    def saveLicense(self):
+        pass
 
 # APPLICATION CREATION AND STARTUP
 # Check if app will be created and started directly from this file
