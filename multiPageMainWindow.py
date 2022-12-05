@@ -280,7 +280,64 @@ class MultiPageMainWindow(QMainWindow):
 
     # TODO: Finish populateLicensePage
     def populateLicensePage(self):
-        pass
+        # Read data from table lupa
+        databaseOperation1 = pgModule.DatabaseOperation()
+        databaseOperation1.getAllRowsFromTable(
+                self.connectionArguments, "public.lupa")
+        
+        # Check if an error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation1.errorMessage,
+                    databaseOperation1.detailedMessage)
+        else:
+            prepareData.prepareTable(databaseOperation1, self.licenseSummaryTW)
+        
+        # Read data from table elain, and populate the combo box
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(
+                self.connectionArguments, "public.elain")
+        
+        # Check if an error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation2.errorMessage,
+                    databaseOperation2.detailedMessage)
+        else:
+            self.licenseAnimalList = prepareData.prepareComboBox(
+                databaseOperation2, self.licenseAnimalCB, 0, 0)
+        
+        # Read data from table aikuinenvasa, and populate the combo box
+        databaseOperation3 = pgModule.DatabaseOperation()
+        databaseOperation3.getAllRowsFromTable(
+                self.connectionArguments, "public.aikuinenvasa")
+        
+        # Check if an error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation3.errorMessage,
+                    databaseOperation3.detailedMessage)
+        else:
+           self.licenseAgeGroupList = prepareData.prepareComboBox(
+                databaseOperation3, self.licenseAgeGroupCB, 0, 0)
+
+        # Read data from table sukupuoli, and populate the combo box
+        databaseOperation3 = pgModule.DatabaseOperation()
+        databaseOperation3.getAllRowsFromTable(
+                self.connectionArguments, "public.sukupuoli")
+        
+        # Check if an error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert(
+                    "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                    databaseOperation3.errorMessage,
+                    databaseOperation3.detailedMessage)
+        else:
+           self.licenseGenderList = prepareData.prepareComboBox(
+                databaseOperation3, self.licenseGenderCB, 0, 0)
 
     def populateAllPages(self):
         self.populateSummaryPage()
@@ -291,16 +348,16 @@ class MultiPageMainWindow(QMainWindow):
     def saveShot(self):
         errorOccurred = False
         try:
-            shotByChosenItemIx = self.shotByCB.currentIndex() # Row index of the selected row
-            shotById = self.shotByIdList[shotByChosenItemIx] # ID value of the selected row
+            shotByChosenItemIdx = self.shotByCB.currentIndex() # Row index of the selected row
+            shotById = self.shotByIdList[shotByChosenItemIdx] # ID value of the selected row
             shootingDay = self.shotDateDE.date().toPyDate() # Python data is in ISO format
             shootingPlace = self.shotLocationLE.text() # Text value of line edit
             animal = self.shotAnimalCB.currentText() # Selected value of the combo box
             ageGroup = self.shotAgeGroupCB.currentText() # Selected value of the combo box
             gender = self.shotGenderCB.currentText() # Selected value of the combo box
             weight = float(self.shotWeightLE.text()) # Convert line edit value into float (real in the DB)
-            useIx = self.shotUsageCB.currentIndex() # Row index of the selected row
-            use = self.shotUsageIdList[useIx] # ID value of the selected row
+            useIdx = self.shotUsageCB.currentIndex() # Row index of the selected row
+            use = self.shotUsageIdList[useIdx] # ID value of the selected row
             additionalInfo = self.shotAddInfoTE.toPlainText() # Convert multiline text edit into plain text
 
             # Insert data into kaato table
@@ -346,14 +403,16 @@ class MultiPageMainWindow(QMainWindow):
             shareDate = self.shareDateDE.date().toPyDate() # Python data is in ISO format
             portion = self.sharePortionCB.currentText() # Selected value of the combo box
             weight = float(self.shareAmountLE.text()) # Convert line edit value into float (real in the DB)
-            shareByChosenItemIx = self.shareGroupCB.currentIndex() # Row index of the selected row
-            group = self.shareGroupList[shareByChosenItemIx] # ID value of the selected row
+            shareByChosenItemIdx = self.shareGroupCB.currentIndex() # Row index of the selected row
+            group = self.shareGroupList[shareByChosenItemIdx] # ID value of the selected row
+            shareKillChosenRowIdx = self.shareKillsTW.currentRow() # The chosen row
+            shareKillId = int(self.shareKillsTW.itemAt(shareKillChosenRowIdx, 0).text()) # Convert to text and then int
 
             # Insert data into jakotapahtuma table
             # Create an SQL clause to insert element values to the database
             sqlClauseBeginning = """INSERT INTO public.jakotapahtuma(
-                paiva, maara, osnimitys, ryhma_id) VALUES("""
-            sqlClauseValues = f"'{shareDate}', {portion}, '{weight}', '{group}'"
+                paiva, osnimitys, maara, ryhma_id, kaato_id) VALUES("""
+            sqlClauseValues = f"'{shareDate}', '{portion}', {weight}, '{group}', {shareKillId}"
             sqlClauseEnd = ");"
             sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 
@@ -383,7 +442,46 @@ class MultiPageMainWindow(QMainWindow):
 
     # TODO: Finish saveLicense
     def saveLicense(self):
-        pass
+        errorOccurred = False
+        try:
+            licenseYear = self.licenseYearLE.text() # Text value of line edit
+            animal = self.licenseAnimalCB.currentText() # Selected value of the combo box
+            ageGroup = self.licenseAgeGroupCB.currentText() # Selected value of the combo box
+            gender = self.licenseGenderCB.currentText() # Selected value of the combo box
+            amount = self.licenseAmountLE.text() # Text value of line edit
+            
+            # Insert data into lupa table
+            # Create an SQL clause to insert element values to the database
+            sqlClauseBeginning = """INSERT INTO public.lupa(
+                lupavuosi, seura_id, elaimen_nimi, ikaluokka, sukupuoli, maara) VALUES("""
+            sqlClauseValues = f"{licenseYear}, 1, '{animal}', '{ageGroup}', '{gender}', {amount}"
+            sqlClauseEnd = ");"
+            sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+
+        except Exception as error:
+            errorOccurred = True
+            self.alert("Virheellinen syöte", "Tarkista antamasi tiedot.",
+                "Tyyppivirhe.", str(error))
+
+        finally:
+            if errorOccurred == False:
+                # Create a databaseOperation object to execute the SQL clause
+                databaseOperation = pgModule.DatabaseOperation()
+                databaseOperation.insertRowToTable(
+                        self.connectionArguments, sqlClause)
+        
+                # Check if an error has occurred
+                if databaseOperation.errorCode != 0:
+                    self.alert(
+                            "Vakava virhe", "Tietokantaoperaatio epäonnistui.",
+                            databaseOperation.errorMessage,
+                            databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data entries
+                    # and clear previous data from fields
+                    self.populateLicensePage()
+                    self.licenseYearLE.clear()
+                    self.licenseAmountLE.clear()
 
 # APPLICATION CREATION AND STARTUP
 # Check if app will be created and started directly from this file
