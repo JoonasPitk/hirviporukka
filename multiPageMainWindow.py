@@ -39,6 +39,9 @@ class MultiPageMainWindow(QMainWindow):
         # Set current date when the application launches
         self.currentDate = date.today()
 
+        # TODO: Add actions here for dialog windows.
+        self.actionTietokanta.triggered.connect(self.openDBSettingsDialog)
+
         # Summary page (Yhteenveto)
         self.summaryRefreshBtn = self.summaryRefreshPushButton
         self.summaryRefreshBtn.clicked.connect(self.populateSummaryPage)
