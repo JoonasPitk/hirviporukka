@@ -298,6 +298,47 @@ class DatabaseOperation():
         finally:
             if self.errorCode == 0:
                 dbconnection.close()
+    
+    def testConnection(self, connectionArgs):
+        """Tests if connection to the database is successfull
+        Args:
+            connectionArgs (dict): Connection arguments in key-value pairs
+        """
+        server = connectionArgs["server"]
+        port = connectionArgs["port"]
+        database = connectionArgs["database"]
+        user = connectionArgs["user"]
+        password = connectionArgs["password"]
+
+        try:
+            # Connect to the database and set error parameters
+            dbconnection = psycopg2.connect(
+                database=database, user=user, password=password, host=server, port=port)
+            self.errorCode = 0
+            self.errorMessage = "Yhdistettiin tietokantaan"
+            self.detailedMessage = "Connected to database successfully"
+
+            # Create a cursor to retrieve data from the table
+            with dbconnection.cursor() as cursor:
+                sqlClause = "SELECT version();"
+                cursor.execute(sqlClause)
+
+                # Set object properties
+                self.sqlversion = cursor.fetchall()
+
+                self.errorMessage = "Luettiin versionumero onnistuneesti"
+                self.detailedMessage = f"PostgreSQL version is {self.sqlversion}"
+
+        except (Exception, psycopg2.Error )as error:
+
+            # Set error values
+            self.errorCode = 1
+            self.errorMessage = "Tietokannan käsittely ei onnistunut"
+            self.detailedMessage = str(error)
+
+        finally:
+            if self.errorCode == 0:
+                dbconnection.close()
 
 # LOCAL TESTS, REMOVE WHEN FINISHED DESIGNING THE MODULE
 if __name__ == "__main__":
@@ -311,11 +352,25 @@ if __name__ == "__main__":
     
     # Save those settings to a file
     testOperation.saveDatabaseSettingsToFile("settings.dat", dictionary)
-
+    
     # Read settings back from the file
     settingsRead = testOperation.readDatabaseSettingsFromFile("settings.dat")
-
-    # print(settingsRead)
-    testOperation.getAllRowsFromTable(settingsRead, "public.jasen")
-
+    
+    # Get all rows from the test table
+    testOperation.getAllRowsFromTable(settingsRead, "public.pgmodule_test")
     print(testOperation.resultSet)
+    
+    # Test the insert operation with an SQL clause
+    sqlClause = "INSERT INTO public.pgmodule_test(etunimi, sukunimi, ika) VALUES('Jaana', 'Janttari', 17);"
+    print(sqlClause)
+    testOperation.insertRowToTable(settingsRead, sqlClause)
+    print(testOperation.detailedMessage)
+    
+    # Test the delete operation
+    limit = "id = 3"
+    testOperation.deleteFromTable(settingsRead,"public.pgmodule_test", limit)
+    print(testOperation.detailedMessage)
+    print(testOperation.detailedMessage)
+
+    testOperation.testConnection(settingsRead)
+    print(testOperation.errorMessage)
