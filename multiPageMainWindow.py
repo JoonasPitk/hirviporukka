@@ -5,10 +5,12 @@
 # LIBRARIES AND MODULES
 import sys # Needed for starting the application
 from PyQt5.QtWidgets import * # All widgets
+from PyQt5 import QtWebEngineWidgets # For showing html content
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import * # FIXME: Everything for now, change to individual components
 from datetime import date
-import pgModule, prepareData
+
+import pgModule, prepareData, figures
 
 
 # CLASS DEFINITIONS FOR THE APP
@@ -42,6 +44,10 @@ class MultiPageMainWindow(QMainWindow):
         self.summaryRefreshBtn.clicked.connect(self.populateSummaryPage)
         self.summaryMeatSharedTW = self.meatSharedTableWidget
         self.summaryGroupSummaryTW = self.groupSummaryTableWidget
+        self.sankeyWebV = self.sankeyWebEngineView
+        #TODO: Try to set column widths to fill the space available
+        # meatSharedTWHeader = self.summaryMeatSharedTW.horizontalHeader()
+        # meatSharedTWHeader.setSectionResizeMode(0, QHeaderView.Stretch)
         
         # Kill page (Kaato)
         self.shotByCB = self.shotByComboBox
@@ -126,6 +132,14 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(
                 self.connectionArguments, "public.jakoryhma_yhteenveto")
+        
+        #figure = figures.createSankeyChart()
+        figure = figures.testChart()
+        htmlFile = 'meatstreams.html'
+        urlString = f'file:///{htmlFile}'
+        figures.createOfflineFile(figure, htmlFile) # Write the chart to a html file
+        url = QUrl(urlString) # Create a relative url to the file
+        self.sankeyWebV.load(url) # Load it into the web view element
         
         # Check if an error has occurred
         if databaseOperation2.errorCode != 0:
@@ -344,6 +358,15 @@ class MultiPageMainWindow(QMainWindow):
         self.populateKillPage()
         self.populateSharePage()
         self.populateLicensePage()
+
+        testDBConnection = pgModule.DatabaseOperation()
+        connectionArgs = testDBConnection.readDatabaseSettingsFromFile('settings.dat')
+        testDBConnection.testConnection(connectionArgs)
+        if testDBConnection.errorCode == 0:
+            self.populateSummaryPage()
+            self.populateKillPage()
+        else:
+            self.alert('Tarkista tietokanta-asetukset', 'settings.dat-tiedostosta','no further information','no further information')
 
     def saveShot(self):
         errorOccurred = False
